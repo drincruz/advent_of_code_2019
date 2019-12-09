@@ -39,4 +39,14 @@ RSpec.describe Day03::Solution do
       expect(solution.process(data)).to eq(135)
     end
   end
+
+  describe '#process_part2' do
+    it 'finds the fewest combined steps the wires take' do
+      wire0 = "R75,D30,R83,U83,L12,D49,R71,U7,L72"
+      wire1 = "U62,R66,U55,R34,D71,R55,D58,R83"
+      data = solution.parse_data([wire0, wire1])
+
+      expect(solution.process_part2(data)).to eq(610)
+    end
+  end
 end

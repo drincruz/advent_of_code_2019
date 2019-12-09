@@ -25,6 +25,14 @@ module Day03
     end
 
     def fill_state(state, point0, point1)
+      steps = state.fetch(point0, [])
+      counter =
+        if point0 == [0, 0]
+          0
+        else
+          1
+        end
+
       if point0[0] != point1[0]
         if point0[0] < point1[0]
           left = point0[0]
@@ -34,9 +42,11 @@ module Day03
           right = point0[0]
         end
 
-        (left..right).each { |n|
+        (left..right).each_with_index { |n, i|
+          step_increment = counter + i
           new_point = [n, point0[1]]
-          state[new_point] = state.fetch(new_point, 0) + 1 ||  1
+          point_steps = state.fetch(new_point, [])
+          state[new_point] = point_steps.push( (steps.first || 0) + step_increment)
         }
       else
         if point0[1] < point1[1]
@@ -47,9 +57,11 @@ module Day03
           right = point0[1]
         end
 
-        (left..right).each { |n|
+        (left..right).each_with_index { |n, i|
+          step_increment = counter + i
           new_point = [point0[0], n]
-          state[new_point] = state.fetch(new_point, 0) + 1 ||  1
+          point_steps = state.fetch(new_point, [])
+          state[new_point] = point_steps.push( (steps.first || 0) + step_increment)
         }
       end
 
@@ -67,6 +79,32 @@ module Day03
     # Honestly, this feels like there should've been a better approach.
     # But, I'm still new to Ruby, so I'm okay with this.
     def process(data)
+      wire0_points = {}
+      current_location = [0, 0]
+
+      data.first.each{ |op|
+        next_location = next_point(current_location, op)
+        fill_state(wire0_points, current_location, next_location)
+        current_location = next_location
+      }
+
+      wire1_points = {}
+      current_location = [0, 0]
+
+      data.last.each{ |op|
+        next_location = next_point(current_location, op)
+        fill_state(wire1_points, current_location, next_location)
+        current_location = next_location
+      }
+
+      wire_crossed_points = wire0_points.keep_if { |k, v| wire1_points.key? k }
+
+      wire_crossed_points.select {
+        |point, count| point != [0, 0]
+      }.map { |point, count| manhattan_distance(point) }.sort.first
+    end
+
+    def process_part2(data)
       wire0_points = {}
 
       current_location = [0, 0]
@@ -87,8 +125,10 @@ module Day03
       wire_crossed_points = wire0_points.keep_if { |k, v| wire1_points.key? k }
 
       wire_crossed_points.select {
-        |point, count| point != [0, 0]
-      }.map { |point, count| manhattan_distance(point) }.sort.first
+        |point, counts| point != [0, 0]
+      }.map {
+        |point, counts| [manhattan_distance(point), wire0_points[point].first + wire1_points[point].first]
+      }
     end
 
     def run
