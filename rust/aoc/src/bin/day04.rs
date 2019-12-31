@@ -78,3 +78,27 @@ fn has_valid_repeat(digits: &[u32]) -> bool {
     }
     return false;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_valid_format() {
+        let digits: Vec<u32> = get_num_digits(123455);
+        assert_eq!(valid_format(&digits), true);
+        let decreasing_digits: Vec<u32> = get_num_digits(554321);
+        assert_eq!(valid_format(&decreasing_digits), false);
+    }
+
+    #[test]
+    fn test_has_valid_repeat() {
+        let digits: Vec<u32> = get_num_digits(123455);
+        assert_eq!(has_valid_repeat(&digits), true);
+        let decreasing_digits: Vec<u32> = get_num_digits(554321);
+        assert_eq!(has_valid_repeat(&decreasing_digits), true);
+        let valid_pairs: Vec<u32> = get_num_digits(111223);
+        assert_eq!(has_valid_repeat(&valid_pairs), true);
+        let invalid_repeat: Vec<u32> = get_num_digits(111234);
+        assert_eq!(has_valid_repeat(&invalid_repeat), false);
+    }
+}
